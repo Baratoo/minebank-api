@@ -2,12 +2,12 @@ package minebank_api.dto;
 
 import java.math.BigDecimal;
 
-public class CreateWalletRequest {
+public class BalanceResponse {
     private Long playerId;
     private String nickname;
     private BigDecimal balance;
 
-    public CreateWalletRequest(Long playerId, String nickname, BigDecimal balance) {
+    public BalanceResponse(Long playerId, String nickname, BigDecimal balance) {
         this.playerId = playerId;
         this.nickname = nickname;
         this.balance = balance;
@@ -16,6 +16,7 @@ public class CreateWalletRequest {
     public Long getPlayerId() {
         return playerId;
     }
+
     public String getNickName() {
         return nickname;
     }

@@ -1,9 +1,12 @@
-package minebank_api.domain;
+package minebank_api.service;
 
+import minebank_api.domain.MarketItem;
 import minebank_api.repository.MarketItemRepository;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 
+@Service
 public class MarketItemService {
     private final MarketItemRepository marketItemRepository;
 
@@ -13,7 +16,14 @@ public class MarketItemService {
 
     public MarketItem getOrCreateMarketItem(String minecraftMaterial, String displayName, BigDecimal basePrice, Integer stock) {
         MarketItem marketItem = marketItemRepository.findByMinecraftMaterial(minecraftMaterial)
-                .orElse(() -> marketItemRepository.save(new MarketItem(minecraftMaterial, displayName, basePrice, stock)));
+                .orElseGet(() -> marketItemRepository.save(new MarketItem(minecraftMaterial, displayName, basePrice, stock)));
+
+        return marketItem;
+    }
+
+    public MarketItem getMarketItem(String minecraftMaterial) {
+        return marketItemRepository.findByMinecraftMaterial(minecraftMaterial)
+                .orElseThrow(() -> new RuntimeException("Item não encontrado"));
     }
 
 }
