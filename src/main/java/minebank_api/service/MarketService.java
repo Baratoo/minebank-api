@@ -1,9 +1,11 @@
 package minebank_api.service;
 
 import minebank_api.domain.*;
+import minebank_api.engine.PriceEngine;
 import minebank_api.repository.MarketItemRepository;
 import minebank_api.repository.MarketPriceHistoryRepository;
 import minebank_api.repository.WalletRepository;
+import org.springframework.boot.web.embedded.netty.NettyWebServer;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -16,17 +18,19 @@ public class MarketService {
     private final WalletService walletService;
     private final WalletRepository walletRepository;
     private final SystemPlayerService systemPlayerService;
-    private  MarketPriceHistoryRepository marketPriceHistoryRepository;
+    private final PriceEngine priceEngine;
+    private final MarketPriceHistoryRepository marketPriceHistoryRepository;
 
     public MarketService(MarketItemService marketItemService, MarketItemRepository marketItemRepository,
                          WalletService walletService, WalletRepository walletRepository,
-                         SystemPlayerService systemPlayerService, MarketPriceHistoryRepository marketPriceHistoryRepository) {
+                         SystemPlayerService systemPlayerService, MarketPriceHistoryRepository marketPriceHistoryRepository, PriceEngine priceEngine) {
         this.marketItemService = marketItemService;
         this.marketItemRepository = marketItemRepository;
         this.walletService = walletService;
         this.walletRepository = walletRepository;
         this.systemPlayerService = systemPlayerService;
         this.marketPriceHistoryRepository = marketPriceHistoryRepository;
+        this.priceEngine = priceEngine;
     }
 
     public MarketItem buyItem(Player player, String minecraftMaterial, Integer quantity) {
@@ -45,7 +49,10 @@ public class MarketService {
         Player market = systemPlayerService.getOrCreateMarketPlayer();
         walletService.transfer(player, market, total, TransactionType.MARKET_BUY);
 //        wallet.debit(total);
-        item.buy(quantity);
+
+        BigDecimal newPrice = priceEngine.calculateNewPrice(item, quantity, TransactionType.MARKET_BUY);
+
+        item.buy(quantity, newPrice);
         marketItemRepository.save(item);
         marketPriceHistoryRepository.save(new MarketPriceHistory(item, oldPrice, item.getCurrentPrice(), quantity, TransactionType.MARKET_BUY));
         return item;
@@ -65,8 +72,9 @@ public class MarketService {
             throw new RuntimeException("Mercado está sem Dinheiro para Comprar! ");
         }
 
+        BigDecimal newPrice = priceEngine.calculateNewPrice(item, quantity, TransactionType.MARKET_SELL);
         walletService.transfer(market, player, total, TransactionType.MARKET_SELL);
-        item.sell(quantity);
+        item.sell(quantity,  newPrice);
         marketItemRepository.save(item);
         marketPriceHistoryRepository.save(new MarketPriceHistory(item, oldPrice, item.getCurrentPrice(), quantity, TransactionType.MARKET_SELL));
         return item;

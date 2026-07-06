@@ -1,9 +1,6 @@
 package minebank_api.domain;
 
 import jakarta.persistence.*;
-import minebank_api.repository.MarketItemRepository;
-import minebank_api.repository.MarketPriceHistoryRepository;
-import org.hibernate.annotations.Comment;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -91,7 +88,7 @@ public class MarketItem {
         return updatedAt;
     }
 
-    public void buy(Integer quantity) {
+    public void buy(Integer quantity, BigDecimal newPrice) {
         if (quantity <= 0){
             throw new RuntimeException("Quantidade Inválida");
         }
@@ -101,14 +98,14 @@ public class MarketItem {
 
         this.stock -= quantity;
         this.demandIndex += quantity;
-
         //por agora 2%
-        BigDecimal factor = BigDecimal.valueOf(1 + (quantity * 0.02));
-        this.currentPrice = this.currentPrice.multiply(factor);
+//        BigDecimal factor = BigDecimal.valueOf(1 + (quantity * 0.02));
+//        this.currentPrice = this.currentPrice.multiply(factor);
+        this.currentPrice = newPrice;
         this.updatedAt = LocalDateTime.now();
     }
 
-    public void sell(Integer quantity) {
+    public void sell(Integer quantity, BigDecimal newPrice) {
         if (quantity <= 0){
             throw new RuntimeException("Quantidade Inválida");
         }
@@ -117,11 +114,12 @@ public class MarketItem {
         this.supplyIndex += quantity;
 
         //por agora 2%
-        BigDecimal factor = BigDecimal.valueOf(1 - (quantity * 0.02));
-        if (factor.compareTo(new BigDecimal("0.50")) < 0) {
-            factor = new BigDecimal("0.50");
-        }
-        this.currentPrice = this.currentPrice.multiply(factor);
+//        BigDecimal factor = BigDecimal.valueOf(1 - (quantity * 0.02));
+//        if (factor.compareTo(new BigDecimal("0.50")) < 0) {
+//            factor = new BigDecimal("0.50");
+//        }
+//        this.currentPrice = this.currentPrice.multiply(factor);
+        this.currentPrice = newPrice;
         this.updatedAt = LocalDateTime.now();
     }
 }
