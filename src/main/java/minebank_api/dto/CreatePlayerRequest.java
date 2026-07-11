@@ -13,4 +13,12 @@ public class CreatePlayerRequest {
     public String getNickname() {
         return nickname;
     }
+
+    public void setMinecraftUuid(UUID minecraftUuid) {
+        this.minecraftUuid = minecraftUuid;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
 }
