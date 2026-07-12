@@ -43,7 +43,7 @@ public class ControllerMarketItem {
 
     @GetMapping("/items")
     public List<MarketItem> getItems(){
-        return marketItemRepository.findAll();
+        return marketItemService.getAllMarketItems();
     }
 
     @GetMapping("/item/{minecraftMaterial}/history")

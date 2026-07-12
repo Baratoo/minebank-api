@@ -5,6 +5,7 @@ import minebank_api.repository.MarketItemRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class MarketItemService {
@@ -24,6 +25,10 @@ public class MarketItemService {
     public MarketItem getMarketItem(String minecraftMaterial) {
         return marketItemRepository.findByMinecraftMaterial(minecraftMaterial)
                 .orElseThrow(() -> new RuntimeException("Item não encontrado"));
+    }
+
+    public List<MarketItem> getAllMarketItems() {
+        return marketItemRepository.findAll();
     }
 
 }
